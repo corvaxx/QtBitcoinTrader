@@ -116,6 +116,7 @@ HEADERS += $${PWD}/script/addrulegroup.h \
            $${PWD}/exchange/exchange_bittrex.h \
            $${PWD}/exchange/exchange_hitbtc.h \
            $${PWD}/exchange/exchange_poloniex.h \
+           $${PWD}/exchange/exchange_kraken.h \
            $${PWD}/feecalculator.h \
            $${PWD}/historyitem.h \
            $${PWD}/historymodel.h \
@@ -238,6 +239,7 @@ SOURCES +=$${PWD}/script/addrulegroup.cpp \
           $${PWD}/exchange/exchange_bittrex.cpp \
           $${PWD}/exchange/exchange_hitbtc.cpp \
           $${PWD}/exchange/exchange_poloniex.cpp \
+          $${PWD}/exchange/exchange_kraken.cpp \
           $${PWD}/feecalculator.cpp \
           $${PWD}/historyitem.cpp \
           $${PWD}/historymodel.cpp \

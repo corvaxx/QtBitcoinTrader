@@ -66,6 +66,7 @@
 #include "exchange/exchange_bittrex.h"
 #include "exchange/exchange_hitbtc.h"
 #include "exchange/exchange_poloniex.h"
+#include "exchange/exchange_kraken.h"
 #include <QSystemTrayIcon>
 #include <QtCore/qmath.h>
 #include "script/addrulegroup.h"
@@ -654,6 +655,10 @@ void QtBitcoinTrader::setupClass()
     case 14:
         currentExchange = new Exchange_Poloniex(baseValues.restSign, baseValues.restKey);
         break;//Poloniex
+
+    case 15:
+        currentExchange = new Exchange_Kraken(baseValues.restSign, baseValues.restKey);
+        break;//Kraken
 
     default:
         return;
