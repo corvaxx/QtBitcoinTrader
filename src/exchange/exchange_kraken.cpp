@@ -335,20 +335,35 @@ void Exchange_Kraken::dataReceivedAuth(QByteArray data, int reqType)
 	case 202: //info; private : account/getbalances
 		{
 			if (!success)
+            {
                 break;
+            }
             
-            arr = doc.object().value("result").toArray();
-            
-            for (const QJsonValue &v : arr) {
-                if (v.toObject().value("Currency").toString() == baseValues.currentPair.currAStr) {
-                    double newBtcBalance = v.toObject().value("Available").toDouble();
-                    if(lastBtcBalance!=newBtcBalance)emit accBtcBalanceChanged(baseValues.currentPair.symbol,newBtcBalance);
-                    lastBtcBalance=newBtcBalance;
+            QJsonObject balances = doc.object().value("result").toObject();
+            QStringList keys = balances.keys();
+
+            for (const QString & key : qAsConst(keys))
+            {
+                const QJsonValue & val = balances[key];
+                double balance = val.isDouble() ? val.toDouble() :
+                                 val.isString() ? val.toString().toDouble() : 0;
+
+                if (key == baseValues.currentPair.currAStr)
+                {
+                    if (lastBtcBalance != balance)
+                    {
+                        emit accBtcBalanceChanged(baseValues.currentPair.symbol, balance);
+                    }
+                    lastBtcBalance = balance;
                 }
-                if (v.toObject().value("Currency").toString() == baseValues.currentPair.currBStr) {
-                    double newUsdBalance = v.toObject().value("Available").toDouble();
-                    if(newUsdBalance!=lastUsdBalance)emit accUsdBalanceChanged(baseValues.currentPair.symbol,newUsdBalance);
-                    lastUsdBalance=newUsdBalance;
+                if (key == baseValues.currentPair.currBStr)
+                {
+                    if (balance != lastUsdBalance)
+                    {
+                        emit accUsdBalanceChanged(baseValues.currentPair.symbol, balance);
+
+                    }
+                    lastUsdBalance = balance;
                 }
             }
 		}
