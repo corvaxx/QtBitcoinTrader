@@ -376,35 +376,54 @@ void Exchange_Kraken::dataReceivedAuth(QByteArray data, int reqType)
 		break;//info; private : account/getbalances
 	case 204://orders; private : market/getopenorders
 		{
-        if (!success) {
+        if (!success)
+        {
             break;
         }
         
-		if(lastOrders!=data)
+        if (lastOrders != data)
 		{
-			lastOrders=data;
-            arr = doc.object().value("result").toArray();
-			if(arr.isEmpty())
-			{
-				emit ordersIsEmpty();
-				break;
-			}
+            QJsonObject open         = doc.object().value("result").toObject();
+            QJsonObject transactions = open.value("open").toObject();
+            QStringList keys = transactions.keys();
+            if (keys.isEmpty())
+            {
+                emit ordersIsEmpty();
+                break;
+            }
 
-			QList<OrderItem> *orders=new QList<OrderItem>;
-            for (const QJsonValue &val : arr) {
-				OrderItem currentOrder;
-                
-				currentOrder.oid=val.toObject().value("OrderUuid").toString().toLatin1();
-                currentOrder.date=QDateTime::fromString(val.toObject().value("Opened").toString().replace("T", " ").replace(QRegularExpression("(.\\d+)$"), "") + "+00:00",
-                                                                   Qt::ISODate).toTime_t();
-                currentOrder.type=val.toObject().value("OrderType").toString()=="LIMIT_SELL";
-				currentOrder.status=1;
-				currentOrder.amount=val.toObject().value("QuantityRemaining").toDouble();
-				currentOrder.price=val.toObject().value("Limit").toDouble();
-				currentOrder.symbol=baseValues.currentPair.symbol;
-				if(currentOrder.isValid())(*orders)<<currentOrder;
-			}
-            emit orderBookChanged(baseValues.currentPair.symbol,orders);
+            QList<OrderItem> * orders = new QList<OrderItem>;
+
+            for (const QString & key : qAsConst(keys))
+            {
+                const QJsonObject & val = transactions[key].toObject();
+                if (val.isEmpty())
+                {
+                    continue;
+                }
+
+                OrderItem currentOrder;
+
+                currentOrder.oid    = key.toLatin1();
+                currentOrder.date   = toDouble(val.value("opentm"));
+                currentOrder.status = 1;
+                currentOrder.amount = toDouble(val.value("vol"));
+                // currentOrder.price  = toDouble(val.value("price"));
+                currentOrder.symbol = baseValues.currentPair.symbol;
+
+                const QJsonObject & descr = val.value("descr").toObject();
+                currentOrder.type   = descr.value("ordertype").toString() == "limit";
+                currentOrder.price = toDouble(descr.value("price"));
+
+                if (currentOrder.isValid())
+                {
+                    (*orders) << currentOrder;
+                }
+            }
+
+            emit orderBookChanged(baseValues.currentPair.symbol, orders);
+
+            lastOrders = data;
 		}
 		break;//orders; private : market/getopenorders
 		}
