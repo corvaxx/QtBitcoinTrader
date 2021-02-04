@@ -5,7 +5,17 @@ error("Qt 4 is no longer supported. In order to compile Qt Bitcoin Trader you ne
 lessThan(QT_MAJOR_VERSION, 6) { lessThan(QT_MINOR_VERSION, 9) {
 error("Qt $${QT_VERSION} is no longer supported. In order to compile Qt Bitcoin Trader you need update at least to Qt 5.9 http://qt.io/download-open-source/ or use pre-compiled binaries https://sourceforge.net/projects/bitcointrader/files/"); } }
 
-TARGET = QtBitcoinTrader
+!include($$PWD/config.pri) {
+    error(Failed to include config.pri)
+}
+
+CONFIG(release, debug|release) {
+    TARGET = ../bin/QtBitcoinTrader
+}
+else:CONFIG(debug, debug|release){
+    TARGET = ../bin-debug/QtBitcoinTrader
+    DEFINES += __DEBUG__
+}
 
 CONFIG	+= qt c++11
 
