@@ -95,6 +95,13 @@ void Exchange_Kraken::reloadDepth()
     Exchange::reloadDepth();
 }
 
+inline double toDouble(const QJsonValue & val)
+{
+    double d = val.isDouble() ? val.toDouble() :
+               val.isString() ? val.toString().toDouble() : 0;
+    return d;
+}
+
 void Exchange_Kraken::dataReceivedAuth(QByteArray data, int reqType)
 {
     if (debugLevel)
