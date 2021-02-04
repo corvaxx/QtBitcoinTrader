@@ -1953,7 +1953,10 @@ void QtBitcoinTrader::setCurrencyPairsList()
     }
 
     currencyMenu->setPairs(currencyItems);
-    currencyMenu->setCurrentIndex(indexCurrency);
+    if (!currencyItems.isEmpty())
+    {
+        currencyMenu->setCurrentIndex(indexCurrency);
+    }
 
     ui.filterOrdersCurrency->clear();
     ui.filterOrdersCurrency->insertItems(0, filterItems.isEmpty() ? currencyItems : filterItems);
