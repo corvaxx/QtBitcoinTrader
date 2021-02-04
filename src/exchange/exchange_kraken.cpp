@@ -352,8 +352,7 @@ void Exchange_Kraken::dataReceivedAuth(QByteArray data, int reqType)
             for (const QString & key : qAsConst(keys))
             {
                 const QJsonValue & val = balances[key];
-                double balance = val.isDouble() ? val.toDouble() :
-                                 val.isString() ? val.toString().toDouble() : 0;
+                double balance = toDouble(val);
 
                 if (key == baseValues.currentPair.currAStr)
                 {
