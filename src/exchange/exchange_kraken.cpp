@@ -441,32 +441,52 @@ void Exchange_Kraken::dataReceivedAuth(QByteArray data, int reqType)
         break;//order/sell
     case 208: //history; private : account/getorderhistory
         {
-        if (!success) {
+        if (!success)
+        {
             break;
         }
+
         arr = doc.object().value("result").toArray();
-        if(lastHistory!=data)
+        if (lastHistory != data)
 		{
-			lastHistory=data;
-            
-            QList<HistoryItem> *historyItems=new QList<HistoryItem>;
-            if (arr.isEmpty()) {
-                historyChanged(historyItems);
+            QJsonObject open         = doc.object().value("result").toObject();
+            QJsonObject transactions = open.value("closed").toObject();
+            QStringList keys = transactions.keys();
+            if (keys.isEmpty())
+            {
+                emit ordersIsEmpty();
                 break;
             }
+
+            QList<HistoryItem> * historyItems = new QList<HistoryItem>;
             
-            for (const QJsonValue &val : arr) {
+            for (const QString & key : qAsConst(keys))
+            {
+                const QJsonObject & val = transactions[key].toObject();
+                if (val.isEmpty())
+                {
+                    continue;
+                }
+
                 HistoryItem currentHistoryItem;
-                currentHistoryItem.type = val.toObject().value("OrderType").toString() == "LIMIT_SELL" ? 1 : 2;
-                currentHistoryItem.symbol = baseValues.currentPair.symbol;
-                currentHistoryItem.dateTimeInt = QDateTime::fromString(val.toObject().value("TimeStamp").toString().replace("T", " ").replace(QRegularExpression("(.\\d+)$"), "") + "+00:00",
-                                                                     Qt::ISODate).toTime_t();
-                currentHistoryItem.price = val.toObject().value("PricePerUnit").toDouble();
-                currentHistoryItem.volume = val.toObject().value("Quantity").toDouble();
-                if(currentHistoryItem.isValid())(*historyItems)<<currentHistoryItem;
+
+                currentHistoryItem.dateTimeInt = toDouble(val.value("opentm"));
+                currentHistoryItem.volume      = toDouble(val.value("vol"));
+                currentHistoryItem.symbol      = baseValues.currentPair.symbol;
+
+                const QJsonObject & descr = val.value("descr").toObject();
+                currentHistoryItem.type   = descr.value("ordertype").toString() == "limit" ? 1 : 2;
+                currentHistoryItem.price  = toDouble(descr.value("price"));
+
+                if(currentHistoryItem.isValid())
+                {
+                    (*historyItems)<<currentHistoryItem;
+                }
             }
 
 			emit historyChanged(historyItems);
+
+            lastHistory = data;
 		}
 		break;//history; private : account/getorderhistory
 		}
