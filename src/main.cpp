@@ -537,17 +537,20 @@ void BaseValues::initSettings()
 
 int main(int argc, char* argv[])
 {
+    QScopedPointer<JulyLockFile> julyLock(nullptr);
+    QLoggingCategory::setFilterRules("qt.network.ssl.warning=false");
+
+    baseValues_ = new BaseValues();
+    baseValues.initHiDpi();
+
+    QApplication a(argc, argv);
+    a.setApplicationName("QtBitcoinTrader");
+
     if (QSslSocket::sslLibraryVersionString().isEmpty())
     {
         QMessageBox::critical(nullptr, "Qt Bitcoin Trader", julyTr("CANT_LOAD_OPENSSL", "Can't load OpenSSL"));
         return 0;
     }
-
-    QScopedPointer<JulyLockFile> julyLock(nullptr);
-    QLoggingCategory::setFilterRules("qt.network.ssl.warning=false");
-    baseValues_ = new BaseValues();
-    baseValues.initHiDpi();
-    QApplication a(argc, argv);
 
     if (argc > 1)
     {
@@ -607,8 +610,6 @@ int main(int argc, char* argv[])
                                      "You can now delete installation file").replace("<br>", "<br><br>"));
         }
     }
-
-    a.setApplicationName("QtBitcoinTrader");
 
     if (!baseValues.initAppDataDir(a))
         return 0;
