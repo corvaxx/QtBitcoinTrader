@@ -488,9 +488,15 @@ void Exchange_Kraken::dataReceivedAuth(QByteArray data, int reqType)
 
                 if(currentHistoryItem.isValid())
                 {
-                    (*historyItems)<<currentHistoryItem;
+                    (*historyItems) << currentHistoryItem;
                 }
             }
+
+            std::sort(historyItems->begin(), historyItems->end(),
+                      [](const HistoryItem & l, const HistoryItem & r)
+                      {
+                          return l.dateTimeInt < r.dateTimeInt;
+                      });
 
 			emit historyChanged(historyItems);
 
