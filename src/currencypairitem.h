@@ -39,6 +39,7 @@ struct CurrencyPairItem
     CurrencyPairItem();
 
     void setSymbol(QByteArray symb);
+    void setAltSymbol(QByteArray symb);
 
     QString currAName;
     QString name;
@@ -61,6 +62,9 @@ struct CurrencyPairItem
     QString currBStr;
     QString currBStrLow;
     QString currBSign;
+
+    QString currAltAStr;
+    QString currAltBStr;
 
     double priceMin;//qPow(0.1,priceDecimals);
     //double priceMax;

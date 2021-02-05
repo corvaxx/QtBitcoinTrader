@@ -91,3 +91,24 @@ void CurrencyPairItem::setSymbol(QByteArray symb)
 
     currAName = currAInfo.name;
 }
+
+void CurrencyPairItem::setAltSymbol(QByteArray symb)
+{
+    if (symb.size() < 5)
+    {
+        return;
+    }
+
+    int posSplitter = symb.indexOf('/');
+
+    if (posSplitter == -1)
+    {
+        currAltAStr = symb.left(3);
+        currAltBStr = symb.right(3);
+    }
+    else
+    {
+        currAltAStr = symb.left(posSplitter);
+        currAltBStr = symb.right(symb.size() - posSplitter - 1);
+    }
+}
