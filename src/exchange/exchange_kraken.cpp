@@ -488,7 +488,7 @@ void Exchange_Kraken::dataReceivedAuth(QByteArray data, int reqType)
                 currentHistoryItem.dateTimeInt = toDouble(val.value("opentm"));
                 currentHistoryItem.volume      = toDouble(val.value("vol"));
                 currentHistoryItem.symbol      = baseValues.currentPair.symbol;
-                currentHistoryItem.type        = descr.value("ordertype").toString() == "limit" ? 1 : 2;
+                currentHistoryItem.type        = descr.value("type").toString() == "sell" ? 1 : 2;
                 currentHistoryItem.price       = toDouble(descr.value("price"));
 
                 if(currentHistoryItem.isValid())
