@@ -147,5 +147,6 @@
         <file>Resources/Exchanges/Poloniex.ini</file>
         <file>Resources/Exchanges/Logos/Poloniex.png</file>
         <file>Resources/Exchanges/Logos/Poloniex_Big.png</file>
+        <file>Resources/CurrencySign/XBT.png</file>
     </qresource>
 </RCC>
