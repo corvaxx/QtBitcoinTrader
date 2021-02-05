@@ -472,6 +472,11 @@ void Exchange_Kraken::dataReceivedAuth(QByteArray data, int reqType)
                     continue;
                 }
 
+                if (val["status"] == "canceled")
+                {
+                    continue;
+                }
+
                 const QJsonObject & descr = val.value("descr").toObject();
                 if (descr.value("pair").toString() != baseValues.currentPair.currAStr + baseValues.currentPair.currBStr)
                 {
