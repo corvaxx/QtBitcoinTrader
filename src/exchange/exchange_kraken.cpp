@@ -354,7 +354,7 @@ void Exchange_Kraken::dataReceivedAuth(QByteArray data, int reqType)
                 const QJsonValue & val = balances[key];
                 double balance = toDouble(val);
 
-                if (key == baseValues.currentPair.currAStr)
+                if (key == baseValues.currentPair.currAStr || key == baseValues.currentPair.currAltAStr)
                 {
                     if (lastBtcBalance != balance)
                     {
@@ -362,7 +362,7 @@ void Exchange_Kraken::dataReceivedAuth(QByteArray data, int reqType)
                     }
                     lastBtcBalance = balance;
                 }
-                if (key == baseValues.currentPair.currBStr)
+                if (key == baseValues.currentPair.currBStr || key == baseValues.currentPair.currAltBStr)
                 {
                     if (balance != lastUsdBalance)
                     {
