@@ -336,6 +336,8 @@ void IniEngine::parseExchange(QString exchangeFileName)
 
         currentPair.setSymbol(currentPair.name.toLatin1());
 
+        currentPair.setAltSymbol(settingsParams.value(symbolList.at(n) + "/AltSymbol", "").toByteArray());
+
         if (currentPair.name.size() == 6 && currentPair.name.indexOf('/') == -1)
             currentPair.name.insert(3, "/");
 
