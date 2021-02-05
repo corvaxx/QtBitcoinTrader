@@ -402,6 +402,12 @@ void Exchange_Kraken::dataReceivedAuth(QByteArray data, int reqType)
                     continue;
                 }
 
+                const QJsonObject & descr = val.value("descr").toObject();
+                if (descr.value("pair").toString() != baseValues.currentPair.currAStr + baseValues.currentPair.currBStr)
+                {
+                    continue;
+                }
+
                 OrderItem currentOrder;
 
                 currentOrder.oid    = key.toLatin1();
@@ -410,10 +416,8 @@ void Exchange_Kraken::dataReceivedAuth(QByteArray data, int reqType)
                 currentOrder.amount = toDouble(val.value("vol"));
                 // currentOrder.price  = toDouble(val.value("price"));
                 currentOrder.symbol = baseValues.currentPair.symbol;
-
-                const QJsonObject & descr = val.value("descr").toObject();
                 currentOrder.type   = descr.value("ordertype").toString() == "limit";
-                currentOrder.price = toDouble(descr.value("price"));
+                currentOrder.price  = toDouble(descr.value("price"));
 
                 if (currentOrder.isValid())
                 {
@@ -468,15 +472,19 @@ void Exchange_Kraken::dataReceivedAuth(QByteArray data, int reqType)
                     continue;
                 }
 
+                const QJsonObject & descr = val.value("descr").toObject();
+                if (descr.value("pair").toString() != baseValues.currentPair.currAStr + baseValues.currentPair.currBStr)
+                {
+                    continue;
+                }
+
                 HistoryItem currentHistoryItem;
 
                 currentHistoryItem.dateTimeInt = toDouble(val.value("opentm"));
                 currentHistoryItem.volume      = toDouble(val.value("vol"));
                 currentHistoryItem.symbol      = baseValues.currentPair.symbol;
-
-                const QJsonObject & descr = val.value("descr").toObject();
-                currentHistoryItem.type   = descr.value("ordertype").toString() == "limit" ? 1 : 2;
-                currentHistoryItem.price  = toDouble(descr.value("price"));
+                currentHistoryItem.type        = descr.value("ordertype").toString() == "limit" ? 1 : 2;
+                currentHistoryItem.price       = toDouble(descr.value("price"));
 
                 if(currentHistoryItem.isValid())
                 {
