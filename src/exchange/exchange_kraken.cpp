@@ -500,7 +500,7 @@ void Exchange_Kraken::dataReceivedAuth(QByteArray data, int reqType)
             std::sort(historyItems->begin(), historyItems->end(),
                       [](const HistoryItem & l, const HistoryItem & r)
                       {
-                          return l.dateTimeInt < r.dateTimeInt;
+                          return l.dateTimeInt > r.dateTimeInt;
                       });
 
 			emit historyChanged(historyItems);
