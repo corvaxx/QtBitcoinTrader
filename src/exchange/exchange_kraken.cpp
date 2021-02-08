@@ -416,7 +416,7 @@ void Exchange_Kraken::dataReceivedAuth(QByteArray data, int reqType)
                 currentOrder.amount = toDouble(val.value("vol"));
                 // currentOrder.price  = toDouble(val.value("price"));
                 currentOrder.symbol = baseValues.currentPair.symbol;
-                currentOrder.type   = descr.value("ordertype").toString() == "limit";
+                currentOrder.type   = descr.value("type").toString() == "sell";
                 currentOrder.price  = toDouble(descr.value("price"));
 
                 if (currentOrder.isValid())
