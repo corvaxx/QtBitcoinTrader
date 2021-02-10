@@ -356,19 +356,18 @@ void Exchange_Kraken::dataReceivedAuth(QByteArray data, int reqType)
 
                 if (key == baseValues.currentPair.currAStr || key == baseValues.currentPair.currAltAStr)
                 {
-                    if (lastBtcBalance != balance)
-                    {
-                        emit accBtcBalanceChanged(baseValues.currentPair.symbol, balance);
-                    }
+//                    if (lastBtcBalance != balance)
+//                    {
+//                        emit accBtcBalanceChanged(baseValues.currentPair.symbol, balance);
+//                    }
                     lastBtcBalance = balance;
                 }
                 if (key == baseValues.currentPair.currBStr || key == baseValues.currentPair.currAltBStr)
                 {
-                    if (balance != lastUsdBalance)
-                    {
-                        emit accUsdBalanceChanged(baseValues.currentPair.symbol, balance);
-
-                    }
+//                    if (balance != lastUsdBalance)
+//                    {
+//                        emit accUsdBalanceChanged(baseValues.currentPair.symbol, balance);
+//                    }
                     lastUsdBalance = balance;
                 }
             }
@@ -380,18 +379,19 @@ void Exchange_Kraken::dataReceivedAuth(QByteArray data, int reqType)
         {
             break;
         }
-        
-        if (lastOrders != data)
-		{
-            QJsonObject open         = doc.object().value("result").toObject();
-            QJsonObject transactions = open.value("open").toObject();
-            QStringList keys = transactions.keys();
-            if (keys.isEmpty())
-            {
-                emit ordersIsEmpty();
-                break;
-            }
 
+        double lastABalance = lastBtcBalance;
+        double lastBBalance = lastUsdBalance;
+
+        QJsonObject open         = doc.object().value("result").toObject();
+        QJsonObject transactions = open.value("open").toObject();
+        QStringList keys = transactions.keys();
+        if (keys.isEmpty())
+        {
+            emit ordersIsEmpty();
+        }
+        else
+        {
             QList<OrderItem> * orders = new QList<OrderItem>;
 
             for (const QString & key : qAsConst(keys))
@@ -423,13 +423,31 @@ void Exchange_Kraken::dataReceivedAuth(QByteArray data, int reqType)
                 {
                     (*orders) << currentOrder;
                 }
+
+                if (currentOrder.type)
+                {
+                    // if sell
+                    lastABalance -= currentOrder.amount;
+                }
+                else
+                {
+                    // if buy
+                    lastBBalance -= currentOrder.amount * currentOrder.price;
+                }
             }
 
-            emit orderBookChanged(baseValues.currentPair.symbol, orders);
+            if (lastOrders != data)
+            {
+                emit orderBookChanged(baseValues.currentPair.symbol, orders);
 
-            lastOrders = data;
-		}
-		break;//orders; private : market/getopenorders
+                lastOrders = data;
+            }
+        }
+
+        emit accBtcBalanceChanged(baseValues.currentPair.symbol, lastABalance);
+        emit accUsdBalanceChanged(baseValues.currentPair.symbol, lastBBalance);
+
+        break;//orders; private : market/getopenorders
 		}
 	case 305: //market/cancel
 		if(success && !cancelingOrderIDs.isEmpty())
@@ -675,7 +693,6 @@ void Exchange_Kraken::secondSlotPrivate()
         case 0:
             if (!isReplayPending(202))
                 sendToApi(202, "Balance", true, true);
-
             break;
 
         case 1:
