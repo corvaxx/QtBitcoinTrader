@@ -442,6 +442,10 @@ void Exchange_Kraken::dataReceivedAuth(QByteArray data, int reqType)
 
                 lastOrders = data;
             }
+            else
+            {
+                delete orders;
+            }
         }
 
         emit accBtcBalanceChanged(baseValues.currentPair.symbol, lastABalance);
