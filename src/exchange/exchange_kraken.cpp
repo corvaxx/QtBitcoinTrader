@@ -403,10 +403,6 @@ void Exchange_Kraken::dataReceivedAuth(QByteArray data, int reqType)
                 }
 
                 const QJsonObject & descr = val.value("descr").toObject();
-                if (descr.value("pair").toString() != baseValues.currentPair.currAStr + baseValues.currentPair.currBStr)
-                {
-                    continue;
-                }
 
                 OrderItem currentOrder;
 
@@ -419,12 +415,7 @@ void Exchange_Kraken::dataReceivedAuth(QByteArray data, int reqType)
                 currentOrder.type   = descr.value("type").toString() != "sell";
                 currentOrder.price  = toDouble(descr.value("price"));
 
-                if (currentOrder.isValid())
-                {
-                    (*orders) << currentOrder;
-                }
-
-                if (currentOrder.type)
+                if (!currentOrder.type)
                 {
                     // if sell
                     lastABalance -= currentOrder.amount;
@@ -434,6 +425,18 @@ void Exchange_Kraken::dataReceivedAuth(QByteArray data, int reqType)
                     // if buy
                     lastBBalance -= currentOrder.amount * currentOrder.price;
                 }
+
+                if (!currentOrder.isValid())
+                {
+                    continue;
+                }
+
+                if (descr.value("pair").toString() != baseValues.currentPair.currAStr + baseValues.currentPair.currBStr)
+                {
+                    continue;
+                }
+
+                (*orders) << currentOrder;
             }
 
             if (lastOrders != data)
