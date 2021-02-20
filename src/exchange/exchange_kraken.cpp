@@ -812,7 +812,7 @@ void Exchange_Kraken::sendToApi(int reqType, QByteArray method, bool auth, bool 
 
 	if(auth)
     {
-        QByteArray nonce = QByteArray::number(++privateNonce);
+        QByteArray nonce = QByteArray::number(QDateTime::currentDateTime().currentMSecsSinceEpoch()); // ++privateNonce);
         QByteArray postData = "nonce=" + nonce + "&" + commands;
         QByteArray forHash = "/0/private/" + method + QByteArray::fromHex(JulyAES256::sha256(nonce + postData));
 		if(sendNow)
