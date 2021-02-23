@@ -412,26 +412,34 @@ void Exchange_Kraken::dataReceivedAuth(QByteArray data, int reqType)
                 currentOrder.amount = toDouble(val.value("vol"));
                 // currentOrder.price  = toDouble(val.value("price"));
                 currentOrder.symbol = baseValues.currentPair.symbol;
-                currentOrder.type   = descr.value("type").toString() != "sell";
+                currentOrder.type   = descr.value("type").toString() == "sell";
                 currentOrder.price  = toDouble(descr.value("price"));
 
-                if (!currentOrder.type)
+                const QString & pair = descr.value("pair").toString();
+
+                if (currentOrder.type)
                 {
-                    // if sell
-                    lastABalance -= currentOrder.amount;
+                    if (pair.startsWith(baseValues.currentPair.currAStr))
+                    {
+                        // if sell
+                        lastABalance -= currentOrder.amount;
+                    }
                 }
                 else
                 {
-                    // if buy
-                    lastBBalance -= currentOrder.amount * currentOrder.price;
+                    if (pair.endsWith(baseValues.currentPair.currBStr))
+                    {
+                        // if buy
+                        lastBBalance -= currentOrder.amount * currentOrder.price;
+                    }
                 }
 
-                if (!currentOrder.isValid())
+                if (pair != baseValues.currentPair.currAStr + baseValues.currentPair.currBStr)
                 {
                     continue;
                 }
 
-                if (descr.value("pair").toString() != baseValues.currentPair.currAStr + baseValues.currentPair.currBStr)
+                if (!currentOrder.isValid())
                 {
                     continue;
                 }
